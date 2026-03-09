@@ -1,0 +1,119 @@
+﻿
+
+@model PropertySalesTracker.ViewModels.LoginViewModel
+
+@{
+    ViewData["Title"] = "Login";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - Property Sales Tracker</title>
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+
+    <style>
+        body {
+            background: url('/images/mort.png') center/cover no-repeat;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            width: 420px;
+            border-radius: 12px;
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 0 25px rgba(25, 135, 84, 0.3);
+        }
+
+        .form-label {
+            font-weight: 600;
+        }
+
+        .btn-success {
+            background-color: #198754;
+            border: none;
+        }
+
+        .btn-success:hover {
+            background-color: #157347;
+        }
+
+        .btn-outline-secondary {
+            border-color: #ced4da;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card p-4 border-0 shadow-lg">
+        <div class="text-center mb-4">
+            <img src="~/images/favicon.ico" alt="Company Icon" class="mb-3" style="height: 60px;">
+            <h3 class="fw-bold text-success">Property Sales </h3>
+            <p class="text-muted">Sign in to continue</p>
+        </div>
+
+        <form asp-controller="Account" asp-action="Login" method="post" class="needs-validation">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control form-control-lg" placeholder="Enter your email" autocomplete="username" />
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3 position-relative">
+                <label asp-for="Password" class="form-label"></label>
+                <div class="input-group">
+                    <input asp-for="Password" type="password" class="form-control form-control-lg" id="passwordField" placeholder="Enter password" autocomplete="current-password" />
+                    <button type="button" class="btn btn-outline-secondary" id="togglePassword" tabindex="-1">
+                        <i class="bi bi-eye-slash" id="toggleIcon"></i>
+                    </button>
+                </div>
+                <span asp-validation-for="Password" class="text-danger small"></span>
+            </div>
+
+            <div class="form-check mb-3">
+                <input asp-for="RememberMe" class="form-check-input" />
+                <label asp-for="RememberMe" class="form-check-label"></label>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100 btn-lg">Sign In</button>
+            <div class="text-center mt-3">
+                <a asp-controller="Account" asp-action="ForgotPassword" class="text-success fw-semibold">
+                    Forgot your password?
+                </a>
+            </div>
+        </form>
+
+        <div class="text-center mt-4 small text-muted">
+            © @(DateTime.Now.Year) Jubilee-Life Mortgage Bank
+        </div>
+    </div>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const togglePassword = document.querySelector("#togglePassword");
+            const passwordField = document.querySelector("#passwordField");
+            const toggleIcon = document.querySelector("#toggleIcon");
+
+            togglePassword.addEventListener("click", () => {
+                const type = passwordField.getAttribute("type") === "password" ? "text" : "password";
+                passwordField.setAttribute("type", type);
+                toggleIcon.classList.toggle("bi-eye");
+                toggleIcon.classList.toggle("bi-eye-slash");
+            });
+        });
+    </script>
+</body>
+</html>

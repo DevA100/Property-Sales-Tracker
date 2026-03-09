@@ -1,0 +1,56 @@
+﻿@model PropertySalesTracker.ViewModels.RegisterViewModel
+@{
+    ViewData["Title"] = "Create Account Officer";
+}
+
+<div class="container py-5" style="max-width:600px;">
+    <h3 class="mb-4 text-success">Create New Account Officer</h3>
+
+    <form asp-action="CreateAccountOfficer" method="post">
+        <div class="mb-3">
+            <label asp-for="FullName" class="form-label"></label>
+            <input asp-for="FullName" class="form-control" />
+            <span asp-validation-for="FullName" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3 position-relative">
+            <label asp-for="Password" class="form-label"></label>
+            <div class="input-group">
+                <input asp-for="Password" class="form-control" type="password" id="passwordField" />
+                <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                    <i class="bi bi-eye" id="eyeIcon"></i>
+                </button>
+            </div>
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Branch" class="form-label"></label>
+            <input asp-for="Branch" class="form-control" />
+            <span asp-validation-for="Branch" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-success w-100">Create Account Officer</button>
+    </form>
+</div>
+<a href="c:\users\chidimmajacob\desktop\propertysalestracker\views\account\createaccountofficer.cshtml">c:\users\chidimmajacob\desktop\propertysalestracker\views\account\createaccountofficer.cshtml</a>
+@section Scripts {
+    <script>
+        const togglePassword = document.getElementById("togglePassword");
+        const passwordField = document.getElementById("passwordField");
+        const eyeIcon = document.getElementById("eyeIcon");
+
+        togglePassword.addEventListener("click", function () {
+            const type = passwordField.getAttribute("type") === "password" ? "text" : "password";
+            passwordField.setAttribute("type", type);
+            eyeIcon.classList.toggle("bi-eye");
+            eyeIcon.classList.toggle("bi-eye-slash");
+        });
+    </script>
+}

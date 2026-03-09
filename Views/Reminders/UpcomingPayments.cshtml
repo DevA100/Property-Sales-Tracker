@@ -1,0 +1,74 @@
+﻿@model List<DueCustomerDto>
+
+@{
+    ViewData["Title"] = "Customers With Upcoming Payments";
+}
+
+<h2 class="mt-4 mb-4">Upcoming Payment Due Dates</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success mt-2">@TempData["Success"]</div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger mt-2">@TempData["Error"]</div>
+}
+<!-- Bulk Notification Button -->
+<form method="post" asp-controller="Reminders" asp-action="SendAll">
+    <button type="submit" class="btn btn-success mb-3">
+        Send All Notifications
+    </button>
+</form>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Customer</th>
+            <th>Property</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Diaspora?</th>
+            <th>Officer</th>
+            <th>Due Date</th>
+            <th>Days Left</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.CustomerName</td>
+                <td>@item.PropertyName</td>
+                <td>@item.Email</td>
+                <td>@item.Phone</td>
+
+                <td>
+                    @(item.IsDiaspora ? "Yes (Email Only)" : "No")
+                </td>
+
+                <td>@item.OfficerName</td>
+
+                <td>@item.DueDate.ToString("dd MMM yyyy")</td>
+
+                <td>
+                    <span class="badge bg-warning text-dark">
+                        @item.DaysLeft days
+                    </span>
+                </td>
+
+                <td>
+                    <form method="post" asp-controller="Reminders" asp-action="Send">
+                        <input type="hidden" name="id" value="@item.SaleId" />
+                        <button class="btn btn-primary btn-sm" type="submit">
+                            Notify
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

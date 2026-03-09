@@ -1,0 +1,88 @@
+﻿@model PropertySalesTracker.Models.Property
+
+<div class="container mt-5">
+    <h2>Create Property</h2>
+    <hr />
+
+    <form asp-action="Create">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Name" class="form-label"></label>
+            <input asp-for="Name" class="form-control" />
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Description" class="form-label"></label>
+            <input asp-for="Description" class="form-control" />
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Location" class="form-label"></label>
+            <input asp-for="Location" class="form-control" />
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Size" class="form-label"></label>
+            <input asp-for="Size" class="form-control" />
+        </div>
+        <div class="col-md-6 mb-3">
+            <label>Total Units Available</label>
+            <input type="number"
+                   name="Unit"
+                   class="form-control"
+                   min="1"
+                   required />
+        </div>
+
+
+        <div class="col-md-6 mb-3">
+            <label>Property Type</label>
+            <select name="PropertyType" id="propertyTypeCreate" class="form-control" required>
+                <option value="">-- Select Type --</option>
+                <option value="Flat">Flat</option>
+                <option value="Shop">Shop</option>
+            </select>
+        </div>
+
+        <div class="col-md-6 mb-3" id="unitPriceCreate" style="display:none;">
+            <label>Cost per Unit (₦)</label>
+            <input type="number" name="CostPerUnit" class="form-control" />
+        </div>
+        <div class="col-md-6 mb-3">
+            <label>Selling Price (₦)</label>
+            <input type="number" name="SellingPrice" class="form-control" step="0.01" />
+        </div>
+
+
+        <div class="col-md-6 mb-3" id="squarePriceCreate" style="display:none;">
+            <label>Cost per Square Meter</label>
+            <input type="text" name="CostPerSquare" class="form-control" />
+        </div>
+
+
+        <div class="form-group mb-3">
+            <label asp-for="FormFee" class="form-label"></label>
+            <input asp-for="FormFee" class="form-control" />
+        </div>
+
+        <button type="submit" class="btn btn-success">Create</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+
+
+<script>
+    document.getElementById('propertyTypeCreate').addEventListener('change', function () {
+        const type = this.value;
+
+        if (type === "Flat") {
+            document.getElementById('unitPriceCreate').style.display = 'block';
+            document.getElementById('squarePriceCreate').style.display = 'none';
+        }
+        else if (type === "Shop") {
+            document.getElementById('unitPriceCreate').style.display = 'none';
+            document.getElementById('squarePriceCreate').style.display = 'block';
+        }
+    });
+</script>

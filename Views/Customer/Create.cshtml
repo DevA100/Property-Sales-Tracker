@@ -1,0 +1,237 @@
+﻿@model PropertySalesTracker.Models.DTOs.CustomerCreateDto
+
+
+@{
+    ViewData["Title"] = "Add New Customer";
+}
+
+<div class="container mt-4">
+    <h3 class="fw-bold text-success mb-4">
+        <i class="bi bi-person-plus"></i> Add New Customer
+    </h3>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <form asp-action="Create" method="post" id="createCustomerForm" class="needs-validation" novalidate>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="FirstName" class="form-label fw-semibold">First Name</label>
+                        <input asp-for="FirstName" class="form-control" required />
+                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="LastName" class="form-label fw-semibold">Last Name</label>
+                        <input asp-for="LastName" class="form-control" required />
+                        <span asp-validation-for="LastName" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="Email" class="form-label fw-semibold">Email</label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Phone" class="form-label fw-semibold">Phone</label>
+                        <input asp-for="Phone" class="form-control" />
+                        <span asp-validation-for="Phone" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="Country" class="form-label fw-semibold">Country</label>
+                        <input asp-for="Country" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Branch" class="form-label fw-semibold">Branch / Department</label>
+                        <input asp-for="Branch" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="AccountOfficerId" class="form-label fw-semibold">Account Officer</label>
+                        <select asp-for="AccountOfficerId" class="form-select" asp-items="ViewBag.AccountOfficers">
+                            <option value="">-- Select Officer --</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 d-flex align-items-center">
+                        <div class="form-check mt-4">
+                            <input asp-for="IsDiaspora" class="form-check-input" />
+                            <label asp-for="IsDiaspora" class="form-check-label fw-semibold">Is Diaspora Customer?</label>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+
+                <h5 class="text-success fw-semibold mb-3">
+                    <i class="bi bi-building"></i> Property Details
+                </h5>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="PropertyId" class="form-label fw-semibold">Property</label>
+                        <select asp-for="PropertyId" id="createPropertyId" class="form-select">
+                            <option value="">-- Select Property --</option>
+                            @foreach (var p in (IEnumerable<PropertySalesTracker.Models.Property>)ViewBag.Properties)
+                            {
+                                <option value="@p.Id" data-price="@p.SellingPrice">
+                                    @p.Name (@p.PropertyType)
+                                </option>
+                            }
+
+
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="SubscriptionPlan" class="form-label fw-semibold">Plan</label>
+                        <select asp-for="SubscriptionPlan" class="form-select" required>
+                            <option value="">-- Select Plan --</option>
+                            <option>Monthly</option>
+                            <option>Quarterly</option>
+                            <option>Annual</option>
+                            <option>Outright</option>
+                            <option>Mortgaged</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="Month" class="form-label fw-semibold">Month</label>
+                        <select id="Month" name="Month" class="form-select" required>
+                            <option value="">-- Select Month --</option>
+                            <option>January</option>
+                            <option>February</option>
+                            <option>March</option>
+                            <option>April</option>
+                            <option>May</option>
+                            <option>June</option>
+                            <option>July</option>
+                            <option>August</option>
+                            <option>September</option>
+                            <option>October</option>
+                            <option>November</option>
+                            <option>December</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="Unit" class="form-label fw-semibold">Unit</label>
+                        <input id="Unit" name="Unit" type="number" class="form-control" placeholder="e.g., 1 or 2" min="1" />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="Size" class="form-label fw-semibold">Size (optional)</label>
+                        <input id="Size" name="Size" type="text" class="form-control" placeholder="e.g., 450 sqm" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="Price" class="form-label fw-semibold">Price (₦)</label>
+                        <input id="Price" name="Price" type="text" class="form-control number-field" readonly />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="EquityDeposit" class="form-label fw-semibold">Equity Deposit (₦)</label>
+                        <input id="EquityDeposit" name="EquityDeposit" type="text" class="form-control number-field" />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="FormFee" class="form-label fw-semibold">Form Fee (₦)</label>
+                        <input id="FormFee" name="FormFee" type="text" class="form-control number-field" />
+                    </div>
+
+
+                    <div class="col-md-6">
+                        <label for="Balance" class="form-label fw-semibold">Outstanding (₦)</label>
+                        <input id="Balance" name="Balance" type="text" class="form-control number-field" readonly />
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="submit" class="btn btn-success px-4">
+                        <i class="bi bi-check-circle"></i> Save Customer
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary px-4">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toNumeric(value) {
+        if (!value) return 0;
+        value = String(value).replace(/,/g, "");
+        return Number(value) || 0;
+    }
+
+    function formatDisplay(n) {
+        if (!n) return "";
+        return Number(n).toLocaleString();
+    }
+
+    const propertySelect = document.getElementById("createPropertyId");
+    const priceInput = document.getElementById("Price");
+    const depositInput = document.getElementById("EquityDeposit");
+    const formFeeInput = document.getElementById("FormFee");
+    const balanceInput = document.getElementById("Balance");
+
+    function calculateBalance() {
+        const price = toNumeric(priceInput.value);
+        const deposit = toNumeric(depositInput.value);
+        const formFee = toNumeric(formFeeInput.value);
+
+        const balance = Math.max(0, price - deposit - formFee);
+        balanceInput.value = formatDisplay(balance);
+    }
+
+    function updatePriceFromProperty() {
+        const selected = propertySelect.selectedOptions[0];
+
+        if (!selected || !selected.dataset.price) {
+            priceInput.value = "";
+            balanceInput.value = "";
+            return;
+        }
+
+        const price = Number(selected.dataset.price);
+        priceInput.value = formatDisplay(price);
+
+        calculateBalance();
+    }
+
+    propertySelect.addEventListener("change", updatePriceFromProperty);
+
+    depositInput.addEventListener("input", function () {
+        let raw = this.value.replace(/,/g, '').replace(/[^\d]/g, '');
+        this.value = raw ? Number(raw).toLocaleString() : "";
+        calculateBalance();
+    });
+
+    formFeeInput.addEventListener("input", function () {
+        let raw = this.value.replace(/,/g, '').replace(/[^\d]/g, '');
+        this.value = raw ? Number(raw).toLocaleString() : "";
+        calculateBalance();
+    });
+
+    document.getElementById("createCustomerForm").addEventListener("submit", function () {
+        ["Price", "EquityDeposit", "FormFee", "Balance"].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = el.value.replace(/,/g, "");
+        });
+    });
+
+    window.addEventListener("DOMContentLoaded", function () {
+        if (propertySelect.value) updatePriceFromProperty();
+    });
+</script>

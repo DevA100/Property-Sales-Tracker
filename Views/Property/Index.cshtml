@@ -1,0 +1,222 @@
+﻿@model IEnumerable<PropertySalesTracker.Models.Property>
+
+@{
+    ViewData["Title"] = "Properties";
+}
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="fw-bold text-success mb-0">Properties</h2>
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createModal">
+            <i class="bi bi-plus-circle"></i> Add Property
+        </button>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <form asp-action="Import" method="post" enctype="multipart/form-data" class="mb-3">
+        @Html.AntiForgeryToken()
+        <div class="d-flex gap-2 mb-2">
+            <a asp-action="DownloadTemplate" class="btn btn-info">
+                Download Excel Template
+            </a>
+        </div>
+        <div class="d-flex gap-2">
+            <input type="file" name="file" class="form-control" accept=".xlsx,.xls" required />
+            <button type="submit" class="btn btn-outline-success">
+                <i class="bi bi-upload"></i> Import Properties
+            </button>
+        </div>
+    </form>
+
+    <table class="table table-hover align-middle">
+        <thead class="table-success">
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Location</th>
+                <th>Size</th>
+                <th>Selling Price (₦)</th>
+                <th>Cost / Unit</th>
+                <th>Cost / Sq</th>
+                <th>Form Fee</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var property in Model)
+            {
+                <tr>
+                    <td>@property.Name</td>
+                    <td>@property.PropertyType</td>
+                    <td>@property.Location</td>
+                    <td>@property.Size</td>
+                    <td>₦@property.SellingPrice.ToString("N0")</td>
+                    <td>@(property.CostPerUnit.HasValue ? $"₦{property.CostPerUnit.Value:N0}" : "-")</td>
+                    <td>@(string.IsNullOrWhiteSpace(property.CostPerSquare) ? "-" : property.CostPerSquare)</td>
+                    <td>@(property.FormFee.HasValue ? $"₦{property.FormFee.Value:N0}" : "-")</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editModal-@property.Id">
+                            Edit
+                        </button>
+                        <form asp-action="DeleteConfirmed" asp-route-id="@property.Id" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this property?');">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+
+                <div class="modal fade" id="editModal-@property.Id" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <form asp-action="Edit" method="post">
+                                <div class="modal-header bg-warning">
+                                    <h5>Edit Property</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body row">
+                                    <input type="hidden" name="Id" value="@property.Id" />
+
+                                    <div class="col-md-6 mb-3">
+                                        <label>Name</label>
+                                        <input type="text" name="Name" value="@property.Name" class="form-control" required />
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label>Description</label>
+                                        <input type="text" name="Description" value="@property.Description" class="form-control" />
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label>Location</label>
+                                        <input type="text" name="Location" value="@property.Location" class="form-control" />
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label>Size</label>
+                                        <input type="text" name="Size" value="@property.Size" class="form-control" />
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label>Property Type</label>
+                                        <select name="PropertyType" id="type-@property.Id" class="form-control">
+                                            <option value="Flat" selected="@(property.PropertyType=="Flat")">Flat</option>
+                                            <option value="Shop" selected="@(property.PropertyType=="Shop")">Shop</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label>Selling Price (₦)</label>
+                                        <input type="text" name="SellingPrice" value="@property.SellingPrice.ToString("N0")" class="form-control currency-input" />
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label>Cost per Unit</label>
+                                        <input type="text" name="CostPerUnit" value="@(property.CostPerUnit.HasValue ? property.CostPerUnit.Value.ToString("N0") : "")" class="form-control currency-input" />
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label>Cost per Square (Text)</label>
+                                        <input type="text" name="CostPerSquare" value="@property.CostPerSquare" class="form-control" />
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label>Form Fee</label>
+                                        <input type="text" name="FormFee" value="@(property.FormFee.HasValue ? property.FormFee.Value.ToString("N0") : "")" class="form-control currency-input" />
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="btn btn-warning">Save</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="createModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form asp-action="Create" method="post">
+                <div class="modal-header bg-success text-white">
+                    <h5>Add Property</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body row">
+                    <div class="col-md-6 mb-3">
+                        <label>Name</label>
+                        <input type="text" name="Name" class="form-control" required />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Description</label>
+                        <input type="text" name="Description" class="form-control" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Location</label>
+                        <input type="text" name="Location" class="form-control" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Size</label>
+                        <input type="text" name="Size" class="form-control" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Property Type</label>
+                        <select name="PropertyType" id="propertyTypeCreate" class="form-control" required>
+                            <option value="">Select</option>
+                            <option value="Flat">Flat</option>
+                            <option value="Shop">Shop</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3" id="unitPriceCreate" style="display:none;">
+                        <label>Cost per Unit</label>
+                        <input type="text" name="CostPerUnit" class="form-control currency-input" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Selling Price (₦)</label>
+                        <input type="text" name="SellingPrice" class="form-control currency-input" />
+                    </div>
+                    <div class="col-md-6 mb-3" id="squarePriceCreate" style="display:none;">
+                        <label>Cost per Square (Text)</label>
+                        <input type="text" name="CostPerSquare" class="form-control" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Form Fee</label>
+                        <input type="text" name="FormFee" class="form-control currency-input" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll(".currency-input").forEach(input => {
+        input.addEventListener("input", function () {
+            let value = this.value.replace(/,/g, "");
+            if (!isNaN(value) && value.length > 0) {
+                this.value = Number(value).toLocaleString();
+            }
+        });
+        input.addEventListener("focus", function () { this.value = this.value.replace(/,/g, ""); });
+    });
+
+    document.getElementById('propertyTypeCreate').addEventListener('change', function () {
+        const type = this.value;
+        if (type === "Flat") {
+            document.getElementById('unitPriceCreate').style.display = 'block';
+            document.getElementById('squarePriceCreate').style.display = 'none';
+        } else if (type === "Shop") {
+            document.getElementById('unitPriceCreate').style.display = 'none';
+            document.getElementById('squarePriceCreate').style.display = 'block';
+        } else {
+            document.getElementById('unitPriceCreate').style.display = 'none';
+            document.getElementById('squarePriceCreate').style.display = 'none';
+        }
+    });
+</script>

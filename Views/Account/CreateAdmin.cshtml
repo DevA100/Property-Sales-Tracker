@@ -1,0 +1,60 @@
+﻿@model PropertySalesTracker.ViewModels.RegisterViewModel
+@{
+    ViewData["Title"] = "Create Admin";
+}
+
+<div class="container py-5" style="max-width:600px;">
+    <h3 class="mb-4 text-primary">Create New Admin</h3>
+
+    <form asp-action="CreateAdmin" method="post">
+        <div class="mb-3">
+            <label asp-for="FullName" class="form-label"></label>
+            <input asp-for="FullName" class="form-control" />
+            <span asp-validation-for="FullName" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3 position-relative">
+            <label asp-for="Password" class="form-label"></label>
+            <div class="input-group">
+                <input asp-for="Password" class="form-control" type="password" id="passwordInput" />
+                <button type="button" class="btn btn-outline-secondary" id="togglePassword" tabindex="-1">
+                    <i class="bi bi-eye" id="toggleIcon"></i>
+                </button>
+            </div>
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Branch" class="form-label"></label>
+            <input asp-for="Branch" class="form-control" />
+            <span asp-validation-for="Branch" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Create Admin</button>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('passwordInput');
+        const toggleIcon = document.getElementById('toggleIcon');
+
+        togglePassword.addEventListener('click', function () {
+            const isPassword = passwordInput.getAttribute('type') === 'password';
+            passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+            toggleIcon.classList.toggle('bi-eye');
+            toggleIcon.classList.toggle('bi-eye-slash');
+        });
+    </script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

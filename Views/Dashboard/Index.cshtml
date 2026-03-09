@@ -1,0 +1,212 @@
+﻿
+ @model PropertySalesTracker.ViewModels.DashboardViewModel
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<PropertySalesTracker.Models.ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = "Dashboard";
+    var user = await UserManager.GetUserAsync(User);
+    var branch = user?.Branch ?? "Head Office";
+    var roles = await UserManager.GetRolesAsync(user);
+    bool isAdmin = roles.Contains("Admin") || roles.Contains("SuperAdmin");
+    bool isOfficer = roles.Contains("AccountOfficer");
+}
+
+<div class="container-fluid py-6" style="margin-left:150px; max-width:calc(100% - 260px); padding-top:80px;">
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+        <h3 class="fw-semibold text-dark mb-0">Dashboard Overview</h3>
+        <span class="badge bg-secondary fs-6">
+            <i class="bi bi-building me-1"></i> @branch
+        </span>
+    </div>
+
+    @if (isAdmin)
+    {
+        <div class="mb-4">
+            <a href="/Account/CreateAdmin" class="btn btn-outline-primary btn-sm me-2">
+                <i class="bi bi-person-plus"></i> Create Admin
+            </a>
+            <a href="/Account/CreateAccountOfficer" class="btn btn-outline-success btn-sm me-2">
+                <i class="bi bi-person-badge"></i> Create Account Officer
+            </a>
+            <a href="/Customer/Create" class="btn btn-outline-dark btn-sm">
+                <i class="bi bi-person-lines-fill"></i> Add New Customer
+            </a>
+        </div>
+    }
+    else if (isOfficer)
+    {
+        <div class="mb-4">
+            <a href="/Customer/Create" class="btn btn-outline-dark btn-sm">
+                <i class="bi bi-person-lines-fill"></i> Add New Customer
+            </a>
+        </div>
+    }
+
+    <div class="row g-3 mb-4" style="margin-top:30px;">
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="card border-0 shadow-sm bg-primary text-white text-center">
+                <div class="card-body py-3">
+                    <div class="fw-semibold small text-uppercase mb-1">
+                        @(isOfficer ? "Your Customers" : "Customers")
+                    </div>
+                    <h4 class="fw-bold mb-0">@Model.TotalCustomers</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="card border-0 shadow-sm bg-secondary text-white text-center">
+                <div class="card-body py-3">
+                    <div class="fw-semibold small text-uppercase mb-1">Total Properties</div>
+                    <h4 class="fw-bold mb-0">@Model.TotalProperties</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="card border-0 shadow-sm bg-success text-white text-center">
+                <div class="card-body py-3">
+                    <div class="fw-semibold small text-uppercase mb-1">Sold Properties</div>
+                    <h4 class="fw-bold mb-0">@Model.SoldProperties</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="card border-0 shadow-sm bg-info text-white text-center">
+                <div class="card-body py-3">
+                    <div class="fw-semibold small text-uppercase mb-1">Available Properties</div>
+                    <h4 class="fw-bold mb-0">@Model.AvailableProperties</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="card border-0 shadow-sm bg-warning text-white text-center">
+                <div class="card-body py-3">
+                    <div class="fw-semibold small text-uppercase mb-1">Reserved Properties</div>
+                    <h4 class="fw-bold mb-0">@Model.ReservedProperties</h4>
+                </div>
+            </div>
+        </div>
+
+        @if (isAdmin)
+        {
+            <div class="col-xl-2 col-md-4 col-sm-6">
+                <div class="card border-0 shadow-sm bg-dark text-white text-center">
+                    <div class="card-body py-3">
+                        <div class="fw-semibold small text-uppercase mb-1">Account Officers</div>
+                        <h4 class="fw-bold mb-0">@Model.TotalAccountOfficers</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3">
+
+                <a asp-controller="Account"
+                   asp-action="DownloadAccountOfficerTemplate"
+                   class="btn btn-outline-success btn-sm me-2">
+                    <i class="bi bi-download"></i> Download Template
+                </a>
+
+                <form asp-controller="Account"
+                      asp-action="ImportAccountOfficers"
+                      method="post"
+                      enctype="multipart/form-data"
+                      class="d-inline-flex gap-2">
+
+                    <input type="file"
+                           name="file"
+                           class="form-control form-control-sm"
+                           accept=".xlsx,.xls"
+                           required />
+
+                    <button type="submit" class="btn btn-outline-warning btn-sm">
+                        <i class="bi bi-upload"></i> Import Account Officers
+                    </button>
+                </form>
+
+            </div>
+
+
+        }
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body py-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="fw-semibold mb-0">
+                    <i class="bi bi-receipt"></i> Recent Property Sales
+                </h6>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-sm table-hover align-middle mb-0">
+                    <thead class="table-light small">
+                        <tr>
+                            <th>Customer</th>
+                            <th>Property</th>
+                            <th>Officer</th>
+                            <th>Price</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (Model.RecentSales != null && Model.RecentSales.Any())
+                        {
+                            foreach (var sale in Model.RecentSales)
+                            {
+                                <tr>
+                                    <td>@sale.Customer?.FullName</td>
+                                    <td>@sale.Property?.Name</td>
+                                    <td>@sale.AccountOfficer?.Name</td>
+                                    <td>
+                                        ₦@(sale.SellingPrice.HasValue
+                                           ? string.Format("{0:N0}", sale.SellingPrice.Value)
+                                           : "—")
+                                    </td>
+
+                                    <td>₦@string.Format("{0:N0}", sale.Balance)</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center text-muted small">
+                                    No recent sales found.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+<style>
+    body {
+        background: #f9fafc;
+    }
+
+    .card {
+        border-radius: 0.6rem;
+        transition: transform 0.15s ease;
+    }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+    .fw-semibold {
+        letter-spacing: -0.3px;
+    }
+
+    .table th, .table td {
+        vertical-align: middle !important;
+    }
+</style>
+

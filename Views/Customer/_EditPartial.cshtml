@@ -1,0 +1,172 @@
+﻿@using PropertySalesTracker.Models.DTOs
+@model CustomerUpdateDto
+
+<form asp-action="Edit" method="post" id="editForm">
+    <input type="hidden" asp-for="Id" />
+
+    <h5>Edit Customer</h5>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label asp-for="FirstName" class="form-label"></label>
+            <input asp-for="FirstName" class="form-control" />
+        </div>
+        <div class="col-md-6">
+            <label asp-for="LastName" class="form-label"></label>
+            <input asp-for="LastName" class="form-control" />
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" />
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Phone" class="form-label"></label>
+            <input asp-for="Phone" class="form-control" />
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label asp-for="Month" class="form-label"></label>
+            <select asp-for="Month" class="form-select">
+                <option value="">-- Select Month --</option>
+                @for (int i = 1; i <= 12; i++)
+                {
+                    <option value="@i">@i</option>
+                }
+            </select>
+
+
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Country" class="form-label"></label>
+            <input asp-for="Country" class="form-control" />
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label asp-for="Branch" class="form-label"></label>
+            <input asp-for="Branch" class="form-control" />
+        </div>
+        <div class="col-md-6">
+            <label asp-for="AccountOfficerId" class="form-label"></label>
+            <select asp-for="AccountOfficerId" class="form-select" asp-items="ViewBag.AccountOfficers">
+                <option value="">-- Select Officer --</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label asp-for="IsDiaspora" class="form-label">Is Diaspora Customer?</label><br/>
+            <input asp-for="IsDiaspora" type="checkbox" />
+        </div>
+    </div>
+
+    <h5>Property Details</h5>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label asp-for="PropertyId" class="form-label"></label>
+            <select asp-for="PropertyId" class="form-select" asp-items="ViewBag.Properties">
+                <option value="">-- Select Property --</option>
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="SubscriptionPlan" class="form-label"></label>
+            <select asp-for="SubscriptionPlan" class="form-select">
+                <option value="">-- Select Plan --</option>
+                <option value="Monthly">Monthly</option>
+                <option value="Quarterly">Quarterly</option>
+                <option value="Yearly">Yearly</option>
+                <option value="Outright">Outright</option>
+                <option value="Mortgaged">Mortgaged</option>
+            </select>
+        </div>
+
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label asp-for="Unit" class="form-label"></label>
+            <input asp-for="Unit" class="form-control" placeholder="e.g., 1 or 2" />
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Size" class="form-label"></label>
+            <input asp-for="Size" class="form-control" placeholder="e.g., 450 sqm or 900 sqft" />
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label asp-for="EquityDeposit" class="form-label">Equity Deposit (₦)</label>
+            <input asp-for="EquityDeposit" class="form-control" />
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Balance" class="form-label">Outstanding (₦)</label>
+            <input asp-for="Balance" class="form-control" />
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label asp-for="NextDueDate" class="form-label"></label>
+            <input asp-for="NextDueDate" type="date" class="form-control" />
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Status" class="form-label"></label>
+            <input asp-for="Status" class="form-control" />
+        </div>
+    </div>
+
+    <div class="text-end">
+        <button type="submit" class="btn btn-warning">
+            <i class="bi bi-save"></i> Save Changes
+        </button>
+    </div>
+</form>
+
+@section Scripts {
+<script>
+document.getElementById("editForm").addEventListener("submit", function (e) {
+    e.preventDefault(); 
+    const form = this;
+    const data = new FormData(form);
+
+    fetch(form.action, {
+        method: "POST",
+        body: data
+    })
+    .then(response => {
+        if (response.ok) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+            modal.hide();
+            location.reload();
+        } else {
+            alert("Error updating record.");
+        }
+    })
+    .catch(() => alert("Error sending request."));
+});
+</script>
+}
+
+
+<style>
+    .modal-body {
+           max-height: 75vh;
+           overflow-y: auto;
+    }
+
+    .form-control {
+           width: 100%;
+           box-sizing: border-box;
+    }
+</style>
+
+
+
+

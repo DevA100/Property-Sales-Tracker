@@ -1,0 +1,14 @@
+﻿@{
+    var path = Context.Request.Path.ToString().ToLower();
+
+    if (path.Contains("/account/login") ||
+        path.Contains("/account/register") ||
+        path.Contains("/account/forgotpassword"))
+    {
+        Layout = null; 
+    }
+    else
+    {
+        Layout = "_Layout";
+    }
+}

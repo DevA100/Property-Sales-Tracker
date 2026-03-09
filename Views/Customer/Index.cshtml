@@ -1,0 +1,281 @@
+﻿
+
+@model IEnumerable<PropertySalesTracker.Models.Customer>
+
+@{
+    ViewData["Title"] = "Customer Management";
+}
+
+<h2 class="fw-bold mb-4 mt-5 text-success">
+    <i class="bi bi-people-fill"></i> Customer Management
+</h2>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+
+    <div>
+        <a asp-action="DownloadImportTemplate"
+           asp-controller="Customer"
+           class="btn btn-outline-primary btn-sm mb-2">
+            <i class="bi bi-download"></i> Download Import Template
+        </a>
+
+        <button class="btn btn-outline-success shadow-sm"
+                data-bs-toggle="modal"
+                data-bs-target="#importCustomersModal">
+            <i class="bi bi-upload"></i> Import Customers
+        </button>
+    </div>
+
+</div>
+
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <a asp-action="Create" class="btn btn-success shadow-sm">
+        <i class="bi bi-person-plus"></i> Add New Customer
+    </a>
+
+    <form class="d-flex" method="get" asp-action="Index">
+        <input type="text" name="search" class="form-control me-2" placeholder="Search by name, email, or branch..." />
+        <button class="btn btn-outline-success">Search</button>
+    </form>
+
+    <a asp-action="ExportCustomers"
+       asp-controller="Customer"
+       class="btn btn-outline-success">
+        <i class="bi bi-download"></i> Export Customers
+    </a>
+
+</div>
+
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark sticky-top">
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Account Officer</th>
+                        <th>Branch / Dept</th>
+                        <th>Month</th>
+                        <th>Property</th>
+                        <th>Plan</th>
+                        <th>Unit</th>
+                        <th>Size</th>
+                        <th>Form Fee</th>
+                        <th>Deposit</th>
+                        <th>Outstanding</th>
+                        <th>Next Due Date</th>
+                        <th>Status</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var c in Model)
+                        {
+                            var sale = c.PropertySales?.OrderByDescending(s => s.Id).FirstOrDefault();
+                            <tr>
+                                <td>@($"{c.FirstName} {c.LastName}")</td>
+                                <td>@c.Email</td>
+                                <td>@c.Phone</td>
+                                <td>@(c.AccountOfficer?.Name ?? "—")</td>
+                                <td>@c.Branch</td>
+
+                                @if (sale != null)
+                                {
+                                    <td>@sale.Month</td>
+                                    <td>@(sale.Property?.Name ?? "—")</td>
+                                    <td><span class="badge bg-info text-dark">@sale.SubscriptionPlan</span></td>
+                                    <td>@sale.Unit</td>
+                                    <td>@sale.Size</td>
+                                    <td>₦@string.Format("{0:N0}", sale.FormFee ?? 0)</td>
+                                    <td>₦@string.Format("{0:N0}", sale.EquityDeposit ?? 0)</td>
+                                    <td>₦@string.Format("{0:N0}", sale.Balance ?? 0)</td>
+                                    <td>@(sale.NextDueDate?.ToString("dd MMM yyyy") ?? "—")</td>
+
+
+                                    <td>
+                                        @if (sale.Status == PropertySalesTracker.Models.PropertyStatus.Sold)
+                                        {
+                                            <span class="badge bg-success">Sold</span>
+                                        }
+                                        else if (sale.Status == PropertySalesTracker.Models.PropertyStatus.Reserved)
+                                        {
+                                            <span class="badge bg-warning text-dark">Reserved</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Available</span>
+                                        }
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td colspan="10" class="text-muted text-center">No Sale Record</td>
+                                }
+
+                                <td class="text-center">
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-warning me-1 edit-btn"
+                                            data-id="@c.Id">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+
+                                    <form asp-action="Delete" asp-route-id="@c.Id" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this customer?');">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="15" class="text-center text-muted py-4">
+                                <i class="bi bi-person-dash"></i> No customers found.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header bg-warning text-white">
+                <h5 class="modal-title">Edit Customer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body" id="editModalContent">
+                Loading...
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="modal fade" id="importCustomersModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form asp-action="Import"
+                  method="post"
+                  enctype="multipart/form-data">
+
+                @Html.AntiForgeryToken()
+
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-upload"></i> Import Customers
+                    </h5>
+                    <button type="button" class="btn-close"
+                            data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <p class="text-muted small">
+                        Upload Excel (.xlsx) file following the required format.
+                    </p>
+
+                    <input type="file"
+                           name="file"
+                           class="form-control"
+                           accept=".xlsx"
+                           required />
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">
+                        Import
+                    </button>
+                    <button type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+<style>
+    .table-responsive {
+        max-height: 75vh;
+        overflow-y: auto;
+        overflow-x: auto;
+    }
+
+    thead.sticky-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+
+    table thead th {
+        white-space: nowrap;
+    }
+
+    .table td {
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
+    .badge {
+        font-size: 0.85rem;
+    }
+
+    h2 i {
+        margin-right: 6px;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+
+                    const id = this.dataset.id;
+                    const modalElement = document.getElementById('editModal');
+                    const modalBody = document.getElementById('editModalContent');
+                    const modal = new bootstrap.Modal(modalElement);
+
+                    modalBody.innerHTML = `
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-warning"></div>
+                            <p>Loading form...</p>
+                        </div>`;
+
+                    fetch('/Customer/Edit/' + id)
+                        .then(res => res.text())
+                        .then(html => {
+                            modalBody.innerHTML = html;
+                            modal.show();
+                        })
+                        .catch(() => {
+                            modalBody.innerHTML = '<div class="alert alert-danger">Could not load edit form.</div>';
+                        });
+                });
+            });
+        });
+
+
+    </script>
+}
